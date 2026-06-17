@@ -5,8 +5,14 @@ export async function onRequestPost(context) {
 
     const prompt = `Anda adalah pendongeng anak. Buatkan dongeng untuk anak bernama ${nama}, usia ${usia} tahun, tema ${tema}. Buat dongeng yang ceria, penuh pesan moral, dan tidak menakutkan. Berikan judul yang menarik.`;
 
+    // Pastikan API Key terbaca
+    const apiKey = context.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return Response.json({ cerita: "Eror: GEMINI_API_KEY belum terpasang di Cloudflare Settings!" });
+    }
+
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${context.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -17,10 +23,22 @@ export async function onRequestPost(context) {
     );
 
     const data = await response.json();
-    const cerita = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Gagal mendapatkan cerita.";
+
+    // JIKA GOOGLE MENGIRIMKAN EROR AKTIF
+    if (data.error) {
+      return Response.json({ cerita: `Eror dari Google Gemini: ${data.error.message}` });
+    }
+
+    // MEMBACA JALUR TEKS SECARA AMAN
+    const cerita = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!cerita) {
+      // Jika strukturnya berbeda, kita tampilkan respons mentahnya untuk dicheck
+      return Response.json({ cerita: `Google terhubung, tapi gagal membedah teks. Respons mentah: ${JSON.stringify(data)}` });
+    }
 
     return Response.json({ cerita });
   } catch (err) {
-    return Response.json({ cerita: "Terjadi kesalahan pada server." }, { status: 500 });
+    return Response.json({ cerita: `Terjadi kesalahan pada sistem server: ${err.message}` }, { status: 500 });
   }
 }
