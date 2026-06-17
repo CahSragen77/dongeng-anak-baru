@@ -5,13 +5,12 @@ export async function onRequestPost(context) {
 
     const prompt = `Anda adalah pendongeng anak. Buatkan dongeng untuk anak bernama ${nama}, usia ${usia} tahun, tema ${tema}. Buat dongeng yang ceria, penuh pesan moral, dan tidak menakutkan. Berikan judul yang menarik.`;
 
-    // Ambil API Key dari Cloudflare
     const apiKey = context.env.GEMINI_API_KEY;
     if (!apiKey) {
       return Response.json({ cerita: "Eror: GEMINI_API_KEY belum terpasang di Cloudflare Settings!" });
     }
 
-    // RACIKAN TERBARU: Jalur v1beta + model gemini-1.5-flash (Format resmi Google)
+    // Menggunakan Kombinasi Resmi: v1beta + gemini-1.5-flash
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
@@ -25,16 +24,13 @@ export async function onRequestPost(context) {
 
     const data = await response.json();
 
-    // Jika Google mengirimkan eror aktif
     if (data.error) {
       return Response.json({ cerita: `Eror dari Google Gemini: ${data.error.message}` });
     }
 
-    // Membaca jalur teks secara aman
     const cerita = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    
     if (!cerita) {
-      return Response.json({ cerita: `Google terhubung, tapi gagal membedah teks. Respons mentah: ${JSON.stringify(data)}` });
+      return Response.json({ cerita: `Google sukses terhubung, tapi struktur datanya kosong.` });
     }
 
     return Response.json({ cerita });
