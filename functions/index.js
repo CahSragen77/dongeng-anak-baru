@@ -46,4 +46,6 @@ export async function onRequestPost(context) {
   } catch (err) {
     return Response.json({ cerita: `Terjadi kesalahan pada sistem server Cloudflare: ${err.message}` }, { status: 500 });
   }
+
+  // pancingan biar jalan
 }
