@@ -11,7 +11,7 @@ export async function onRequestPost(context) {
       return Response.json({ cerita: "Eror: GROK_API_KEY belum terpasang di Cloudflare Settings!" });
     }
 
-    // Jalur resmi API Groq Cloud (Standar OpenAI Format)
+    // Jalur resmi API Groq Cloud
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -19,7 +19,7 @@ export async function onRequestPost(context) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192", // Menggunakan Llama 3 bertenaga super
+        model: "llama-3.1-8b-instant", // MENGGUNAKAN MODEL BARU YANG AKTIF DAN SUPER CEPAT
         messages: [
           {
             role: "user",
@@ -37,7 +37,7 @@ export async function onRequestPost(context) {
       return Response.json({ cerita: `Eror dari Groq API: ${data.error.message}` });
     }
 
-    // Mengambil teks cerita secara presisi dari format Groq/OpenAI
+    // Mengambil teks cerita secara presisi
     const cerita = data?.choices?.[0]?.message?.content;
 
     if (!cerita) {
