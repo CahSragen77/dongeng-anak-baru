@@ -11,9 +11,9 @@ export async function onRequestPost(context) {
       return Response.json({ cerita: "Eror: GEMINI_API_KEY belum terpasang di Cloudflare Settings!" });
     }
 
-    // DISINI RACIKAN BARUNYA: Kombinasi v1beta dan gemini-pro (paling stabil)
+    // RACIKAN TERBARU: Jalur v1beta + model gemini-1.5-flash (Format resmi Google)
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
