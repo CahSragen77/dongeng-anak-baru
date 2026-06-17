@@ -8,10 +8,10 @@
         body { font-family: sans-serif; padding: 20px; background: #f8fafc; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .input-group { margin-bottom: 15px; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-radius; }
         button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; }
         .btn-generate { background: #f97316; }
-        #hasil { margin-top: 20px; padding: 15px; background: #f1f5f9; border-radius: 8px; white-space: pre-wrap; display: none; }
+        #hasil { margin-top: 20px; padding: 15px; background: #f1f5f9; border-radius: 8px; white-space: pre-wrap; display: none; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -19,11 +19,11 @@
         <h1>✨ Dongeng AI Anak</h1>
         <div class="input-group">
             <label>Nama Anak</label>
-            <input id="nama" type="text">
+            <input id="nama" type="text" placeholder="Masukkan nama anak...">
         </div>
         <div class="input-group">
             <label>Usia</label>
-            <input id="usia" type="number">
+            <input id="usia" type="number" placeholder="Contoh: 5">
         </div>
         <div class="input-group">
             <label>Tema</label>
@@ -40,25 +40,32 @@
     <script>
         async function generateDongeng() {
             const hasil = document.getElementById('hasil');
+            const nama = document.getElementById('nama').value;
+            const usia = document.getElementById('usia').value;
+            const tema = document.getElementById('tema').value;
+
+            if (!nama || !usia) {
+                alert('Harap isi nama dan usia anak terlebih dahulu ya!');
+                return;
+            }
+
             hasil.style.display = 'block';
-            hasil.innerText = '⏳ Sedang merangkai dongeng...';
+            hasil.innerText = '⏳ Sedang merangkai dongeng indah untuk Anda...';
             
-            const payload = {
-                nama: document.getElementById('nama').value,
-                usia: document.getElementById('usia').value,
-                tema: document.getElementById('tema').value
-            };
+            const payload = { nama, usia, tema };
 
             try {
-                const response = await fetch('/generate', {
+                // Diubah menggunakan jalur universal ke folder functions
+                const response = await fetch('/index', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                
                 const data = await response.json();
                 hasil.innerText = data.cerita;
             } catch (err) {
-                hasil.innerText = '❌ Gagal terhubung ke server.';
+                hasil.innerText = '❌ Gagal terhubung ke server. Pastikan API Key di Cloudflare sudah di-Redeploy.';
             }
         }
     </script>
