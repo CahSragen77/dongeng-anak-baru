@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dongeng AI Anak</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f8fafc; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 15px; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; }
+        button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; }
+        .btn-generate { background: #f97316; }
+        #hasil { margin-top: 20px; padding: 15px; background: #f1f5f9; border-radius: 8px; white-space: pre-wrap; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Dongeng AI Anak</h1>
+        <div class="input-group">
+            <label>Nama Anak</label>
+            <input id="nama" type="text">
+        </div>
+        <div class="input-group">
+            <label>Usia</label>
+            <input id="usia" type="number">
+        </div>
+        <div class="input-group">
+            <label>Tema</label>
+            <select id="tema">
+                <option>Petualangan</option>
+                <option>Persahabatan</option>
+                <option>Fantasi</option>
+            </select>
+        </div>
+        <button class="btn-generate" onclick="generateDongeng()">Buat Dongeng</button>
+        <div id="hasil"></div>
+    </div>
+
+    <script>
+        async function generateDongeng() {
+            const hasil = document.getElementById('hasil');
+            hasil.style.display = 'block';
+            hasil.innerText = '⏳ Sedang merangkai dongeng...';
+            
+            const payload = {
+                nama: document.getElementById('nama').value,
+                usia: document.getElementById('usia').value,
+                tema: document.getElementById('tema').value
+            };
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                hasil.innerText = data.cerita;
+            } catch (err) {
+                hasil.innerText = '❌ Gagal terhubung ke server.';
+            }
+        }
+    </script>
+</body>
+</html>
