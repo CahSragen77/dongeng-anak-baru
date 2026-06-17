@@ -10,9 +10,9 @@ export async function onRequestPost(context) {
       return Response.json({ cerita: "Eror: GEMINI_API_KEY belum terpasang di Cloudflare Settings!" });
     }
 
-    // PAKAI MODEL PRO LATEST: Jalurnya jauh lebih bersahabat di serverless
+    // DISINI RACIKAN UTAMANYA: Menggunakan Jalur API v1 Resmi + gemini-1.5-flash
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { 
@@ -21,21 +21,16 @@ export async function onRequestPost(context) {
         body: JSON.stringify({
           contents: [
             {
-              role: "user",
               parts: [{ text: promptText }]
             }
-          ],
-          generationConfig: {
-            temperature: 0.8,
-            maxOutputTokens: 2048,
-          }
+          ]
         })
       }
     );
 
     const data = await response.json();
 
-    // Deteksi eror internal dari Google
+    // Jika Google mengirimkan eror aktif
     if (data.error) {
       return Response.json({ cerita: `Eror dari Google Gemini: ${data.error.message} (Code: ${data.error.code})` });
     }
@@ -44,7 +39,7 @@ export async function onRequestPost(context) {
     const cerita = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!cerita) {
-      return Response.json({ cerita: `Google merespons, tapi struktur teks kosong.` });
+      return Response.json({ cerita: `Google merespons, tapi struktur teks kosong. Respons mentah: ${JSON.stringify(data)}` });
     }
 
     return Response.json({ cerita });
