@@ -3,71 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dongeng AI Anak</title>
+    <title>✨ Dongeng AI Anak - Dunia Keajaiban</title>
+    <!-- Google Fonts untuk font yang lucu dan bulat -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f8fafc; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .input-group { margin-bottom: 15px; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-radius; }
-        button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; }
-        .btn-generate { background: #f97316; }
-        #hasil { margin-top: 20px; padding: 15px; background: #f1f5f9; border-radius: 8px; white-space: pre-wrap; display: none; line-height: 1.6; }
+        :root {
+            --warna-bg: #E8F5E9; /* Hijau pastel lembut */
+            --warna-utama: #FF7043; /* Oranye ceria */
+            --warna-konten: #FFFFFF;
+            --warna-teks: #2E7D32;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--warna-bg);
+            color: #37474F;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ornamen Awan & Bintang Lucu di Latar Belakang */
+        .ornamen-langit {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.3;
+            user-select: none;
+            z-index: 1;
+        }
+
+        /* Kartu Utama Aplikasi */
+        .container {
+            background: var(--warna-konten);
+            border-radius: 30px;
+            padding: 30px 25px;
+            width: 100%;
+            max-width: 500px; /* Pas banget untuk layar HP dan Desktop */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 4px dashed #A5D6A7;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Judul Lucu */
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--warna-utama);
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px #FFE082;
+        }
+
+        .sub-judul {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #78909C;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        /* Form Styling */
+        .form-grup {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #546E7A;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #C8E6C9;
+            border-radius: 15px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1rem;
+            color: #37474F;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: #F9FBF9;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--warna-utama);
+            box-shadow: 0 0 8px rgba(255, 112, 67, 0.2);
+            background-color: #FFF;
+        }
+
+        /* Tombol Sihir */
+        button {
+            width: 100%;
+            background-color: var(--warna-utama);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 6px #D84315;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: #FF8A65;
+        }
+
+        button:active {
+            box-shadow: 0 2px #D84315;
+            transform: translateY(4px);
+        }
+
+        /* Area Hasil Cerita */
+        .hasil-box {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #FFFDE7; /* Kuning buku cerita kuno */
+            border-radius: 20px;
+            border: 2px solid #FFF59D;
+            min-height: 100px;
+            display: none; /* Sembunyikan jika kosong */
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .hasil-box.aktif {
+            display: block;
+            animation: muncul Saja 0.5s ease;
+        }
+
+        .cerita-teks {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #455A64;
+            white-space: pre-line; /* Menjaga enter/paragraf dari AI */
+        }
+
+        /* Loading Animasi */
+        .loading {
+            text-align: center;
+            font-weight: bold;
+            color: var(--warna-utama);
+            display: none;
+            margin-top: 15px;
+        }
+
+        @keyframes munculSaja {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Ornamen Lucu Bertebaran di Background -->
+    <div class="ornamen-langit" style="top: 10%; left: 5%;">☁️</div>
+    <div class="ornamen-langit" style="top: 15%; right: 8%;">⭐</div>
+    <div class="ornamen-langit" style="bottom: 12%; left: 7%;">🦄</div>
+    <div class="ornamen-langit" style="bottom: 8%; right: 5%;">🚀</div>
+    <div class="ornamen-langit" style="top: 50%; left: 2%;">🧸</div>
+
     <div class="container">
         <h1>✨ Dongeng AI Anak</h1>
-        <div class="input-group">
-            <label>Nama Anak</label>
-            <input id="nama" type="text" placeholder="Masukkan nama anak...">
+        <div class="sub-judul">Membuka Pintu Dunia Imajinasi Si Kecil</div>
+
+        <form id="dongengForm">
+            <div class="form-grup">
+                <label for="nama">👦 Nama Anak:</label>
+                <input type="text" id="nama" placeholder="Contoh: Maskun" required>
+            </div>
+
+            <div class="form-grup">
+                <label for="usia">🎂 Usia Anak (Tahun):</label>
+                <input type="number" id="usia" placeholder="Contoh: 5" min="1" max="12" required>
+            </div>
+
+            <div class="form-grup">
+                <label for="tema">🔮 Tema Petualangan:</label>
+                <select id="tema" id="tema">
+                    <option value="Dunia Fantasi">Dunia Fantasi yang Ajaib</option>
+                    <option value="Luar Angkasa">Petualangan Luar Angkasa</option>
+                    <option value="Hewan yang Bisa Berbicara">Hutan Hewan Jenaka</option>
+                    <option value="Pahlawan Kebaikan">Menjadi Pahlawan Cilik</option>
+                </select>
+            </div>
+
+            <button type="button" id="btnBuat">🪄 Buka Kotak Cerita!</button>
+        </form>
+
+        <div class="loading" id="loadingTeks">🔮 Menyusun Mantra Dongeng... Tunggu sebentar ya sayang...</div>
+
+        <!-- Wadah Buku Cerita -->
+        <div class="hasil-box" id="hasilBox">
+            <div class="cerita-teks" id="ceritaKonten"></div>
         </div>
-        <div class="input-group">
-            <label>Usia</label>
-            <input id="usia" type="number" placeholder="Contoh: 5">
-        </div>
-        <div class="input-group">
-            <label>Tema</label>
-            <select id="tema">
-                <option>Petualangan</option>
-                <option>Persahabatan</option>
-                <option>Fantasi</option>
-            </select>
-        </div>
-        <button class="btn-generate" onclick="generateDongeng()">Buat Dongeng</button>
-        <div id="hasil"></div>
     </div>
 
+    <!-- Script Koneksi ke Serverless Cloudflare Functions -->
     <script>
-        async function generateDongeng() {
-            const hasil = document.getElementById('hasil');
+        document.getElementById('btnBuat').addEventListener('click', async () => {
             const nama = document.getElementById('nama').value;
             const usia = document.getElementById('usia').value;
             const tema = document.getElementById('tema').value;
 
-            if (!nama || !usia) {
-                alert('Harap isi nama dan usia anak terlebih dahulu ya!');
+            if(!nama || !usia) {
+                alert('Eits! Isi nama dan usia si kecil dulu yaa... 😊');
                 return;
             }
 
-            hasil.style.display = 'block';
-            hasil.innerText = '⏳ Sedang merangkai dongeng indah untuk Anda...';
-            
-            const payload = { nama, usia, tema };
+            const loading = document.getElementById('loadingTeks');
+            const hasilBox = document.getElementById('hasilBox');
+            const ceritaKonten = document.getElementById('ceritaKonten');
+
+            // Reset dan Tampilkan Loading
+            loading.style.display = 'block';
+            hasilBox.classList.remove('aktif');
+            ceritaKonten.innerText = '';
 
             try {
-                // Diubah menggunakan jalur universal ke folder functions
-                const response = await fetch('/', {
+                // Memanggil backend Cloudflare Pages Functions kita
+                const response = await fetch('/api/dongeng', { // <-- Sesuaikan dengan endpoint route Anda, atau gunakan '/' jika method-nya POST di index.js langsung
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ nama, usia, tema })
                 });
-                
+
                 const data = await response.json();
-                hasil.innerText = data.cerita;
-            } catch (err) {
-                hasil.innerText = '❌ Gagal terhubung ke server. Pastikan API Key di Cloudflare sudah di-Redeploy.';
+                
+                loading.style.display = 'none';
+                hasilBox.classList.add('aktif');
+                ceritaKonten.innerText = data.cerita;
+
+            } catch (error) {
+                loading.style.display = 'none';
+                hasilBox.classList.add('aktif');
+                ceritaKonten.innerText = 'Waduh, buku dongengnya terjatuh! Silakan coba klik tombol lagi yaa... 😊';
             }
-        }
+        });
     </script>
 </body>
 </html>
