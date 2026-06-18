@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>✨ Dongeng AI Anak - Dunia Keajaiban</title>
-    <!-- Google Fonts untuk font yang lucu dan bulat -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -33,7 +33,7 @@
             overflow-x: hidden;
         }
 
-        /* Ornamen Awan & Bintang Lucu di Latar Belakang */
+        /* Ornamen Latar Belakang */
         .ornamen-langit {
             position: absolute;
             font-size: 2rem;
@@ -42,20 +42,19 @@
             z-index: 1;
         }
 
-        /* Kartu Utama Aplikasi */
+        /* Container Utama */
         .container {
             background: var(--warna-konten);
             border-radius: 30px;
             padding: 30px 25px;
             width: 100%;
-            max-width: 500px; /* Pas banget untuk layar HP dan Desktop */
+            max-width: 500px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             border: 4px dashed #A5D6A7;
             position: relative;
             z-index: 10;
         }
 
-        /* Judul Lucu */
         h1 {
             font-family: 'Fredoka One', cursive;
             color: var(--warna-utama);
@@ -73,7 +72,6 @@
             font-weight: bold;
         }
 
-        /* Form Styling */
         .form-grup {
             margin-bottom: 18px;
         }
@@ -105,7 +103,6 @@
             background-color: #FFF;
         }
 
-        /* Tombol Sihir */
         button {
             width: 100%;
             background-color: var(--warna-utama);
@@ -122,25 +119,23 @@
             letter-spacing: 1px;
         }
 
-        button:hover {
-            background-color: #FF8A65;
-        }
-
+        button:hover { background-color: #FF8A65; }
         button:active {
             box-shadow: 0 2px #D84315;
             transform: translateY(4px);
         }
 
-        /* Area Hasil Cerita */
+        /* Kotak Hasil Cerita */
         .hasil-box {
             margin-top: 30px;
             padding: 20px;
-            background-color: #FFFDE7; /* Kuning buku cerita kuno */
+            background-color: #FFFDE7;
             border-radius: 20px;
             border: 2px solid #FFF59D;
             min-height: 100px;
-            display: none; /* Sembunyikan jika kosong */
+            display: none;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+            position: relative;
         }
 
         .hasil-box.aktif {
@@ -148,14 +143,36 @@
             animation: munculSaja 0.5s ease;
         }
 
+        /* Tombol Audio / Speaker Lucu */
+        .btn-audio {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 4px #1B5E20;
+            margin-bottom: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            width: auto;
+        }
+        .btn-audio:active {
+            box-shadow: 0 1px #1B5E20;
+            transform: translateY(3px);
+        }
+
         .cerita-teks {
             font-size: 1.05rem;
             line-height: 1.6;
             color: #455A64;
-            white-space: pre-line; /* Menjaga enter/paragraf dari AI */
+            white-space: pre-line;
         }
 
-        /* Loading Animasi */
         .loading {
             text-align: center;
             font-weight: bold;
@@ -172,7 +189,6 @@
 </head>
 <body>
 
-    <!-- Ornamen Lucu Bertebaran di Background -->
     <div class="ornamen-langit" style="top: 10%; left: 5%;">☁️</div>
     <div class="ornamen-langit" style="top: 15%; right: 8%;">⭐</div>
     <div class="ornamen-langit" style="bottom: 12%; left: 7%;">🦄</div>
@@ -211,12 +227,17 @@
 
         <!-- Wadah Buku Cerita -->
         <div class="hasil-box" id="hasilBox">
+            <!-- Tombol Speaker Pengeluar Suara Narator -->
+            <button type="button" class="btn-audio" id="btnSuara">🔊 Dengarkan Cerita</button>
             <div class="cerita-teks" id="ceritaKonten"></div>
         </div>
     </div>
 
-    <!-- Script Koneksi langsung ke root Cloudflare -->
     <script>
+        let sintesisSuara = window.speechSynthesis;
+        let ucapanDongeng = null;
+        let sedangBicara = false;
+
         document.getElementById('btnBuat').addEventListener('click', async () => {
             const nama = document.getElementById('nama').value;
             const usia = document.getElementById('usia').value;
@@ -230,14 +251,20 @@
             const loading = document.getElementById('loadingTeks');
             const hasilBox = document.getElementById('hasilBox');
             const ceritaKonten = document.getElementById('ceritaKonten');
+            const btnSuara = document.getElementById('btnSuara');
 
-            // Reset dan Tampilkan Loading
+            // Matikan suara lama jika user bikin cerita baru saat suara masih menyala
+            if (sintesisSuara) {
+                sintesisSuara.cancel();
+                sedangBicara = false;
+                btnSuara.innerHTML = "🔊 Dengarkan Cerita";
+            }
+
             loading.style.display = 'block';
             hasilBox.classList.remove('aktif');
             ceritaKonten.innerText = '';
 
             try {
-                // Mengarah langsung ke root '/' sesuai sukses tadi
                 const response = await fetch('/', { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -254,6 +281,35 @@
                 loading.style.display = 'none';
                 hasilBox.classList.add('aktif');
                 ceritaKonten.innerText = 'Waduh, buku dongengnya terjatuh! Silakan coba klik tombol lagi yaa... 😊';
+            }
+        });
+
+        // Logika Tombol Suara Narator (Play / Stop)
+        document.getElementById('btnSuara').addEventListener('click', () => {
+            const teksCerita = document.getElementById('ceritaKonten').innerText;
+            const btnSuara = document.getElementById('btnSuara');
+
+            if (!teksCerita) return;
+
+            if (sedangBicara) {
+                // Jika sedang ngomong, klik tombol akan mematikan suara
+                sintesisSuara.cancel();
+                sedangBicara = false;
+                btnSuara.innerHTML = "🔊 Dengarkan Cerita";
+            } else {
+                // Mulai membaca dongeng
+                ucapanDongeng = new SpeechSynthesisUtterance(teksCerita);
+                ucapanDongeng.lang = 'id-ID'; // Set suara bahasa Indonesia resmi
+                ucapanDongeng.rate = 0.9;     // Kecepatan membaca agak santai cocok untuk anak
+
+                ucapanDongeng.onend = () => {
+                    sedangBicara = false;
+                    btnSuara.innerHTML = "🔊 Dengarkan Cerita";
+                };
+
+                sintesisSuara.speak(ucapanDongeng);
+                sedangBicara = true;
+                btnSuara.innerHTML = "🛑 Hentikan Suara";
             }
         });
     </script>
